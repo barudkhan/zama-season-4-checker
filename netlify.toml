@@ -1,13 +1,16 @@
 [build]
   command = "npm run build"
   publish = ".next"
-  environment = { NODE_VERSION = "20" }
-
-[[build.cache]]
-  path = ".next/cache"
+  functions = ".netlify/functions"
 
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
   status = 200
   force = true

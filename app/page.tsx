@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 export default function Home() {
   const [username, setUsername] = useState('');
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const check = async () => {
@@ -11,11 +11,14 @@ export default function Home() {
     setLoading(true);
     setData(null);
     try {
-      const res = await fetch(`/api/zama/${username.replace('@', '')}`);
+      const res = await fetch(`/api/check/${username.replace('@', '')}`);
       const json = await res.json();
-      if (res.ok) setData(json);
-      else setData(null);
-    } catch {
+      if (res.ok) {
+        setData(json);
+      } else {
+        setData(null);
+      }
+    } catch (err) {
       setData(null);
     }
     setLoading(false);
@@ -30,12 +33,15 @@ export default function Home() {
       <div>
         <input
           value={username}
-          onChange={e => setUsername(e.target.value)}
+          onChange={(e) => setUsername(e.target.value)}
           placeholder="username"
           style={{ padding: '20px', width: '400px', fontSize: '1.5rem', border: '5px solid #000', borderRight: 'none', borderRadius: '20px 0 0 20px' }}
         />
-        <button onClick={check} disabled={loading}
-          style={{ padding: '20px 60px', fontSize: '1.5rem', background: '#000', color: '#FFD700', border: '5px solid #000', borderRadius: '0 20px 20px 0' }}>
+        <button
+          onClick={check}
+          disabled={loading}
+          style={{ padding: '20px 60px', fontSize: '1.5rem', background: '#000', color: '#FFD700', border: '5px solid #000', borderRadius: '0 20px 20px 0', cursor: 'pointer' }}
+        >
           {loading ? 'WAIT' : 'CHECK'}
         </button>
       </div>

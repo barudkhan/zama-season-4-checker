@@ -1,79 +1,56 @@
-'use client';
-import { useState } from 'react';
+"use client";
+
+import { useState } from "react";
 
 export default function Home() {
-  const [user, setUser] = useState('');
-  const [result, setResult] = useState<any>(null);
-  const [load, setLoad] = useState(false);
+  const [username, setUsername] = useState("");
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
-  const go = async () => {
-    setLoad(true);
-    setResult(null);
-    const r = await fetch(`/api/rank/${user.replace('@', '')}`);
-    const j = await r.json();
-    setResult(j);
-    setLoad(false);
+  const checkUser = async () => {
+    try {
+      setLoading(true);
+      setData(null);
+
+      // FIXED TEMPLATE STRING
+      const clean = username.replace('@', '');
+
+      const res = await fetch(`/api/check/${clean}`);
+      const json = await res.json();
+
+      setData(json);
+    } catch (err) {
+      console.error(err);
+      setData({ error: "Something went wrong" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <main style={{ padding: '80px 20px', textAlign: 'center' }}>
-      <h1 style={{ fontSize: '4.5rem', color: '#000', fontWeight: 'bold' }}>
-        ZAMA S4 CHECKER
-      </h1>
-      <p style={{ fontSize: '2rem', color: '#000', marginBottom: '60px' }}>
-        by @barudkhanweb3
-      </p>
+    <div className="p-6">
+      <input
+        type="text"
+        className="border p-2 rounded"
+        placeholder="Enter username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+      />
 
-      <div style={{ marginBottom: '80px' }}>
-        <input
-          value={user}
-          onChange={(e) => setUser(e.target.value)}
-          placeholder="username"
-          style={{
-            padding: '20px',
-            width: '400px',
-            fontSize: '1.8rem',
-            border: '6px solid #000',
-            borderRight: 'none',
-            borderRadius: '25px 0 0 25px',
-            outline: 'none'
-          }}
-        />
-        <button
-          onClick={go}
-          disabled={load}
-          style={{
-            padding: '20px 70px',
-            fontSize: '1.8rem',
-            background: '#000',
-            color: '#FFD700',
-            border: '6px solid #000',
-            borderRadius: '0 25px 25px 0',
-            cursor: 'pointer'
-          }}
-        >
-          {load ? 'WAIT' : 'CHECK'}
-        </button>
-      </div>
+      <button
+        onClick={checkUser}
+        className="ml-2 px-4 py-2 bg-blue-600 text-white rounded"
+      >
+        Check
+      </button>
 
-      {result && (
-        <div style={{
-          background: '#000',
-          color: '#FFD700',
-          padding: '60px',
-          borderRadius: '30px',
-          maxWidth: '600px',
-          margin: '0 auto',
-          fontSize: '2.2rem',
-          fontWeight: 'bold'
-        }}>
-          <div>@{result.user}</div>
-          <div>Posts: {result.posts}</div>
-          <div>Impressions: {result.impressions}</div>
-          <div>ER: {result.er}</div>
-          <div>Rank: {result.rank}</div>
-        </div>
+      {loading && <p>Loading...</p>}
+
+      {data && (
+        <pre className="mt-4 bg-gray-100 p-4 rounded">
+          {JSON.stringify(data, null, 2)}
+        </pre>
       )}
-    </main>
+    </div>
   );
 }

@@ -5,17 +5,23 @@ export default function Home() {
   const [username, setUsername] = useState('');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const check = async () => {
     if (!username.trim()) return;
     setLoading(true);
+    setError('');
     setData(null);
     try {
       const res = await fetch(`/api/checker/${username.replace('@', '')}`);
       const json = await res.json();
-      if (res.ok) setData(json);
+      if (res.ok && json.posts > 0) {
+        setData(json);
+      } else {
+        setError(json.error || 'No posts found for #ZamaCreatorProgram');
+      }
     } catch {
-      setData(null);
+      setError('API error — check token or try again');
     }
     setLoading(false);
   };
@@ -29,27 +35,26 @@ export default function Home() {
           placeholder="e.g., barudkhanweb3"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          style={{ padding: '12px', width: '300px', border: '1px solid #000', borderRadius: '8px 0 0 8px' }}
+          style={{ padding: '12px', width: '300px', border: '1px solid #ccc', borderRadius: '8px 0 0 8px' }}
         />
         <button
           onClick={check}
           disabled={loading || !username}
-          style={{ padding: '12px 20px', background: '#000', color: '#FFD700', border: 'none', borderRadius: '0 8px 8px 0', cursor: 'pointer' }}
+          style={{ padding: '12px 20px', background: '#FFD700', color: '#000', border: 'none', borderRadius: '0 8px 8px 0', cursor: 'pointer' }}
         >
           {loading ? 'Checking...' : 'Check Rank'}
         </button>
       </div>
-      {data && !data.error && (
-        <div style={{ padding: '20px', background: '#000', color: '#FFD700', borderRadius: '12px', border: '1px solid #000' }}>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {data && (
+        <div style={{ padding: '20px', background: '#1a1a1a', color: '#fff', borderRadius: '12px', border: '1px solid #FFD700' }}>
           <h2 style={{ color: '#FFD700' }}>{data.username}</h2>
           <p><strong>Posts:</strong> {data.posts}</p>
           <p><strong>Impressions:</strong> {data.impressions}</p>
-          <p><strong>ER:</strong> {data.er}</p>
+          <p><strong>ER%:</strong> {data.er}</p>
           <p><strong>Estimated Rank:</strong> {data.estimatedRank}</p>
-          <p style={{ fontSize: '12px', color: '#888' }}>Updated: {new Date(data.updatedAt).toLocaleString()}</p>
         </div>
       )}
-      {data?.error && <p style={{ color: 'red' }}>{data.error}</p>}
     </div>
   );
 }

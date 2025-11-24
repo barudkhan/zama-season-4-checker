@@ -1,27 +1,13 @@
-# netlify.toml — PERFECT FOR NEXT.JS 15 (2025)
-
 [build]
   command = "npm run build"
   publish = ".next"
-  environment = { 
-    NODE_VERSION = "20",
-    NEXT_PRIVATE_TARGET = "serverless"
-  }
+  environment = { NODE_VERSION = "20" }
 
-# Enable Next.js build cache (removes "No build cache found" warning forever)
 [[build.cache]]
   path = ".next/cache"
 
-# Make API routes work perfectly on Netlify
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api"
   status = 200
   force = true
-
-# Optional: Clean URLs (if you ever use static pages)
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  force = false

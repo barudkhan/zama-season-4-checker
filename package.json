@@ -1,4 +1,6 @@
 {
+  "name": "zama-checker",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,6 +11,12 @@
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "twitter-api-v2": "latest"
+    "twitter-api-v2": "^1.16.3"
+  },
+  "devDependencies": {
+    "@netlify/plugin-nextjs": "latest"
+  },
+  "engines": {
+    "node": "20.x"
   }
 }

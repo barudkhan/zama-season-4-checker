@@ -1,4 +1,3 @@
-```tsx
 'use client';
 import { useState } from 'react';
 
@@ -8,46 +7,45 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   const check = async () => {
+    if (!username.trim()) return;
     setLoading(true);
     setData(null);
-    const res = await fetch(`/api/check/${username.replace('@', '')}`);
-    const json = await res.json();
-    setData(json);
+    try {
+      const res = await fetch(`/api/zama/${username.replace('@', '')}`);
+      const json = await res.json();
+      if (res.ok) setData(json);
+      else setData(null);
+    } catch {
+      setData(null);
+    }
     setLoading(false);
   };
 
   return (
-    <main style={{ padding: '60px 20px', textAlign: 'center' }}>
-      <h1 style={{ fontSize: '4rem', color: '#000', margin: '0 0 10px 0' }}>
-        ZAMA S4 CHECKER
-      </h1>
-      <p style={{ fontSize: '1.6rem', color: '#000', marginBottom: '50px' }}>
-        Created by @barudkhanweb3
+    <main style={{ padding: '60px 20px', textAlign: 'center', fontFamily: 'system-ui' }}>
+      <h1 style={{ fontSize: '4rem', color: '#000' }}>ZAMA S4 CHECKER</h1>
+      <p style={{ fontSize: '1.8rem', color: '#000', marginBottom: '50px' }}>
+        By @barudkhanweb3
       </p>
-
-      <div style={{ marginBottom: '60px' }}>
+      <div>
         <input
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="username only"
-          style={{ padding: '20px', width: '380px', fontSize: '1.4rem', border: '5px solid #000', borderRight: 'none', borderRadius: '20px 0 0 20px' }}
+          onChange={e => setUsername(e.target.value)}
+          placeholder="username"
+          style={{ padding: '20px', width: '400px', fontSize: '1.5rem', border: '5px solid #000', borderRight: 'none', borderRadius: '20px 0 0 20px' }}
         />
-        <button
-          onClick={check}
-          disabled={loading}
-          style={{ padding: '20px 50px', fontSize: '1.4rem', background: '#000', color: '#FFD700', border: '5px solid #000', borderRadius: '0 20px 20px 0', cursor: 'pointer' }}
-        >
+        <button onClick={check} disabled={loading}
+          style={{ padding: '20px 60px', fontSize: '1.5rem', background: '#000', color: '#FFD700', border: '5px solid #000', borderRadius: '0 20px 20px 0' }}>
           {loading ? 'WAIT' : 'CHECK'}
         </button>
       </div>
-
       {data && (
-        <div style={{ background: '#000', color: '#FFD700', padding: '50px', borderRadius: '25px', maxWidth: '600px', margin: '0 auto', fontSize: '1.8rem' }}>
-          <h2>@{data.username || username}</h2>
-          <p>Posts: <strong>{data.posts || 0}</strong></p>
-          <p>Impressions: <strong>{data.impressions || 0}</strong></p>
-          <p>ER: <strong>{data.er || '0%'}</strong></p>
-          <p>Rank: <strong>{data.estimatedRank || 'Outside Top 5000'}</strong></p>
+        <div style={{ marginTop: '60px', background: '#000', color: '#FFD700', padding: '50px', borderRadius: '30px', fontSize: '2rem' }}>
+          <h2>@{data.username}</h2>
+          <p>Posts: {data.posts}</p>
+          <p>Impressions: {data.impressions}</p>
+          <p>ER: {data.er}</p>
+          <p>Rank: {data.rank}</p>
         </div>
       )}
     </main>

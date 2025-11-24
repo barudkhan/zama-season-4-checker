@@ -1,56 +1,55 @@
-"use client";
-
-import { useState } from "react";
+'use client';
+import { useState } from 'react';
 
 export default function Home() {
-  const [username, setUsername] = useState("");
-  const [data, setData] = useState<any>(null);
+  const [username, setUsername] = useState('');
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const checkUser = async () => {
+  const check = async () => {
+    if (!username.trim()) return;
+    setLoading(true);
+    setData(null);
     try {
-      setLoading(true);
-      setData(null);
-
-      // FIXED TEMPLATE STRING
-      const clean = username.replace('@', '');
-
-      const res = await fetch(`/api/check/${clean}`);
+      const res = await fetch(`/api/zama-rank/${username.replace('@', '')}`);
       const json = await res.json();
-
-      setData(json);
-    } catch (err) {
-      console.error(err);
-      setData({ error: "Something went wrong" });
-    } finally {
-      setLoading(false);
+      if (res.ok) setData(json);
+    } catch {
+      setData(null);
     }
+    setLoading(false);
   };
 
   return (
-    <div className="p-6">
-      <input
-        type="text"
-        className="border p-2 rounded"
-        placeholder="Enter username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-
-      <button
-        onClick={checkUser}
-        className="ml-2 px-4 py-2 bg-blue-600 text-white rounded"
-      >
-        Check
-      </button>
-
-      {loading && <p>Loading...</p>}
-
-      {data && (
-        <pre className="mt-4 bg-gray-100 p-4 rounded">
-          {JSON.stringify(data, null, 2)}
-        </pre>
+    <div style={{ padding: '40px', maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
+      <h1 style={{ color: '#000' }}>Zama Season 4 Rank Checker 🟨🔒</h1>
+      <p style={{ color: '#000' }}>Public tool — type ANY @username to check their real-time Zama stats!</p>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+        <input
+          placeholder="e.g., barudkhanweb3"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          style={{ padding: '12px', width: '300px', border: '1px solid #000', borderRadius: '8px 0 0 8px' }}
+        />
+        <button
+          onClick={check}
+          disabled={loading || !username}
+          style={{ padding: '12px 20px', background: '#000', color: '#FFD700', border: 'none', borderRadius: '0 8px 8px 0', cursor: 'pointer' }}
+        >
+          {loading ? 'Checking...' : 'Check Rank'}
+        </button>
+      </div>
+      {data && !data.error && (
+        <div style={{ padding: '20px', background: '#000', color: '#FFD700', borderRadius: '12px', border: '1px solid #000' }}>
+          <h2 style={{ color: '#FFD700' }}>{data.username}</h2>
+          <p><strong>Posts:</strong> {data.posts}</p>
+          <p><strong>Impressions:</strong> {data.impressions}</p>
+          <p><strong>ER:</strong> {data.er}</p>
+          <p><strong>Estimated Rank:</strong> {data.estimatedRank}</p>
+          <p style={{ fontSize: '12px', color: '#888' }}>Updated: {new Date(data.updatedAt).toLocaleString()}</p>
+        </div>
       )}
+      {data?.error && <p style={{ color: 'red' }}>{data.error}</p>}
     </div>
   );
 }

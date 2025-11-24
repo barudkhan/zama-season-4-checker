@@ -1,6 +1,4 @@
 {
-  "name": "zama-checker",
-  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -11,6 +9,6 @@
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "twitter-api-v2": "^1.16.3"
+    "twitter-api-v2": "latest"
   }
 }

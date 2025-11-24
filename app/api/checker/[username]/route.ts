@@ -29,10 +29,10 @@ export async function GET(request: Request, { params }: { params: { username: st
     }
 
     if (postCount === 0) {
-      return NextResponse.json({ error: 'No #ZamaCreatorProgram posts found' });
+      return NextResponse.json({ error: 'No #ZamaCreatorProgram posts found since Nov 1' });
     }
 
-    const er = totalImpressions > 0 ? ((totalEngagements / totalImpressions) * 100).toFixed(1) : '0.0';
+    const er = totalImpressions > 0 ? ((totalEngagements / totalImpressions) * 100).toFixed(2) + '%' : '0.00%';
 
     let estimatedRank = 'Outside Top 5000';
     if (totalImpressions > 150000) estimatedRank = 'Top 300';
@@ -46,11 +46,11 @@ export async function GET(request: Request, { params }: { params: { username: st
       username: `@${username}`,
       posts: postCount,
       impressions: totalImpressions.toLocaleString(),
-      er: `${er}%`,
+      er,
       estimatedRank,
       updatedAt: new Date().toISOString()
     });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || 'API error — check token or try again', details: err.code || 'Unknown' });
+    return NextResponse.json({ error: err.message || 'API error' });
   }
 }

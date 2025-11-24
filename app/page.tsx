@@ -3,27 +3,15 @@ import { useState } from 'react';
 
 export default function Home() {
   const [username, setUsername] = useState('');
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const check = async () => {
-    if (!username.trim()) return;
     setLoading(true);
-    setError('');
     setData(null);
-    console.log('Button clicked, fetching for:', username);  // Debug log
-    try {
-      const res = await fetch(`/api/checker/${username.replace('@', '')}`);  // Make sure this path matches your API folder
-      console.log('Fetch response status:', res.status);  // Debug log
-      const json = await res.json();
-      console.log('API response:', json);  // Debug log
-      if (res.ok) setData(json);
-      else setError(json.error || 'No posts found');
-    } catch (err) {
-      console.error('Fetch error:', err);  // Debug log
-      setError('API error — check token or try again');
-    }
+    const res = await fetch(`/api/checker/${username.replace('@', '')}`);
+    const json = await res.json();
+    setData(json);
     setLoading(false);
   };
 
@@ -40,20 +28,19 @@ export default function Home() {
         />
         <button
           onClick={check}
-          disabled={loading || !username}
-          style={{ padding: '12px 20px', background: '#FFD700', color: '#000', border: 'none', borderRadius: '0 8px 8px 0', cursor: 'pointer' }}
+          disabled={loading}
+          style={{ padding: '12px 20px', background: '#000', color: '#FFD700', border: 'none', borderRadius: '0 8px 8px 0', cursor: 'pointer' }}
         >
           {loading ? 'Checking...' : 'Check Rank'}
         </button>
       </div>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {data && !data.error && (
-        <div style={{ padding: '20px', background: '#1a1a1a', color: '#fff', borderRadius: '12px', border: '1px solid #FFD700' }}>
-          <h2 style={{ color: '#FFD700' }}>{data.username}</h2>
-          <p><strong>Posts:</strong> {data.posts}</p>
-          <p><strong>Impressions:</strong> {data.impressions}</p>
-          <p><strong>ER:</strong> {data.er}</p>
-          <p><strong>Estimated Rank:</strong> {data.estimatedRank}</p>
+      {data && (
+        <div style={{ padding: '20px', background: '#000', color: '#FFD700', borderRadius: '12px' }}>
+          <h2>{data.username || username}</h2>
+          <p>Posts: {data.posts || 0}</p>
+          <p>Impressions: {data.impressions || 0}</p>
+          <p>ER: {data.er || '0%'}</p>
+          <p>Rank: {data.estimatedRank || 'Calculating...'}</p>
         </div>
       )}
     </div>

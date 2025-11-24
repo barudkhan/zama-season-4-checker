@@ -7,7 +7,6 @@ export async function GET(request: Request, { params }: { params: { username: st
   const username = params.username.toLowerCase();
 
   try {
-    // Here is where `searchRecent` is used (replaces searchAll for free token)
     const tweets = await client.v2.searchRecent({
       query: `from:${username} #ZamaCreatorProgram since:2025-11-01`,
       'tweet.fields': ['public_metrics', 'created_at'],
@@ -30,10 +29,10 @@ export async function GET(request: Request, { params }: { params: { username: st
     }
 
     if (postCount === 0) {
-      return NextResponse.json({ error: 'No #ZamaCreatorProgram posts found since Nov 1' });
+      return NextResponse.json({ error: 'No #ZamaCreatorProgram posts found' });
     }
 
-    const er = totalImpressions > 0 ? ((totalEngagements / totalImpressions) * 100).toFixed(2) + '%' : '0.00%';
+    const er = totalImpressions > 0 ? ((totalEngagements / totalImpressions) * 100).toFixed(1) : '0.0';
 
     let estimatedRank = 'Outside Top 5000';
     if (totalImpressions > 150000) estimatedRank = 'Top 300';
@@ -47,11 +46,11 @@ export async function GET(request: Request, { params }: { params: { username: st
       username: `@${username}`,
       posts: postCount,
       impressions: totalImpressions.toLocaleString(),
-      er,
+      er: `${er}%`,
       estimatedRank,
       updatedAt: new Date().toISOString()
     });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || 'API error' });
+    return NextResponse.json({ error: err.message || 'API error — check token or try again', details: err.code || 'Unknown' });
   }
 }

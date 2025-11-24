@@ -1,5 +1,5 @@
 {
-  "name": "zama-checker",
+  "name": "zama-s4-checker",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -8,9 +8,9 @@
     "start": "next start"
   },
   "dependencies": {
-    "next": "14.0.0",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "next": "15.0.0",
+    "react": "19.0.0-rc-f994737d14-20241022",
+    "react-dom": "19.0.0-rc-f994737d14-20241022",
     "twitter-api-v2": "^1.16.3"
   }
 }

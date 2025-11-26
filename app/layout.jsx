@@ -1,12 +1,13 @@
-export const metadata = {
-  title: "Zama Checker",
-  description: "Check Twitter rank of Zama users"
-};
-
-export default function RootLayout({ children }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body style={{ margin: 0, background: '#FFD700', minHeight: '100vh' }}>
+        {children}
+      </body>
     </html>
   );
 }

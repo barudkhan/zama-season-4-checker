@@ -1,56 +1,32 @@
-import { TwitterApi } from 'twitter-api-v2';
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
-const client = new TwitterApi(process.env.TWITTER_BEARER!);
+export const dynamic = "force-dynamic"; // ensure route runs at request-time
 
-export async function GET(request: Request, { params }: { params: { username: string } }) {
-  const username = params.username.toLowerCase();
+export async function GET(request, { params }) {
+  const username = params?.username || "zama";
+  const token = process.env.TWITTER_BEARER;
+
+  if (!token) {
+    return NextResponse.json({ error: "TWITTER_BEARER missing on server" }, { status: 500 });
+  }
 
   try {
-    const tweets = await client.v2.searchRecent({
-      query: `from:${username} #ZamaCreatorProgram since:2025-11-01`,
-      'tweet.fields': ['public_metrics', 'created_at'],
-      max_results: 100
+    // request public fields including follower count
+    const url = `https://api.twitter.com/2/users/by/username/${encodeURIComponent(username)}?user.fields=public_metrics,verified,description`;
+    const resp = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "User-Agent": "zama-checker"
+      },
+      // ensure no next fetch caching
+      next: { revalidate: 0 }
     });
 
-    let totalImpressions = 0;
-    let totalEngagements = 0;
-    let postCount = 0;
-
-    if (tweets.data) {
-      for (const tweet of tweets.data) {
-        const metrics = tweet.public_metrics;
-        if (metrics?.impression_count > 0) {
-          totalImpressions += metrics.impression_count;
-          totalEngagements += (metrics.like_count || 0) + (metrics.retweet_count || 0) + (metrics.quote_count || 0);
-          postCount++;
-        }
-      }
-    }
-
-    if (postCount === 0) {
-      return NextResponse.json({ error: 'No #ZamaCreatorProgram posts found since Nov 1' });
-    }
-
-    const er = totalImpressions > 0 ? ((totalEngagements / totalImpressions) * 100).toFixed(2) + '%' : '0.00%';
-
-    let estimatedRank = 'Outside Top 5000';
-    if (totalImpressions > 150000) estimatedRank = 'Top 300';
-    else if (totalImpressions > 90000) estimatedRank = 'Top 500';
-    else if (totalImpressions > 55000) estimatedRank = 'Top 700';
-    else if (totalImpressions > 35000) estimatedRank = 'Top 1000';
-    else if (totalImpressions > 15000) estimatedRank = 'Top 2000';
-    else if (postCount > 10) estimatedRank = 'Top 3000+';
-
-    return NextResponse.json({
-      username: `@${username}`,
-      posts: postCount,
-      impressions: totalImpressions.toLocaleString(),
-      er,
-      estimatedRank,
-      updatedAt: new Date().toISOString()
-    });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || 'API error' });
+    const data = await resp.json();
+    const status = resp.ok ? 200 : (resp.status || 500);
+    return NextResponse.json(data, { status });
+  } catch (err) {
+    console.error("API error:", err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

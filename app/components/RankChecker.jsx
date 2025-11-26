@@ -14,10 +14,10 @@ export default function RankChecker() {
     setError(null);
 
     try {
-      const res = await fetch(`/api/checker/${encodeURIComponent(username || "zama")}`);
-      const json = await res.json();
-      if (!res.ok) setError(json.error || JSON.stringify(json));
-      else setResult(json);
+      const res = await fetch(`/api/checker/${encodeURIComponent(username)}`);
+      const data = await res.json();
+      if (!res.ok) setError(data.error || JSON.stringify(data));
+      else setResult(data);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -26,37 +26,24 @@ export default function RankChecker() {
   }
 
   return (
-    <div style={{ maxWidth: 760, margin: "28px auto", padding: 12 }}>
-      <h2>Zama Rank Checker</h2>
-      <form onSubmit={handleCheck} style={{ marginBottom: 12 }}>
+    <div style={{ maxWidth: 600 }}>
+      <form onSubmit={handleCheck} style={{ marginBottom: 10 }}>
         <input
-          placeholder="Twitter username (without @). Example: zama"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          style={{ padding: 8, width: "60%", marginRight: 8 }}
+          placeholder="Twitter username (without @)"
+          style={{ padding: 8, width: "70%" }}
         />
-        <button type="submit" disabled={loading} style={{ padding: "8px 12px" }}>
+        <button type="submit" style={{ padding: "8px 12px", marginLeft: 6 }}>
           {loading ? "Checking..." : "Check"}
         </button>
       </form>
 
-      {error && <div style={{ color: "#900", marginBottom: 12 }}><strong>Error:</strong> {error}</div>}
-
+      {error && <div style={{ color: "red" }}>{error}</div>}
       {result && (
-        <div style={{ border: "1px solid #ddd", padding: 12 }}>
-          <h3>Result</h3>
-          {result.data ? (
-            <>
-              <p><strong>Name:</strong> {result.data.name}</p>
-              <p><strong>Username:</strong> @{result.data.username}</p>
-              <p><strong>Verified:</strong> {String(result.data.verified)}</p>
-              <p><strong>Followers:</strong> {result.data.public_metrics?.followers_count ?? "-"}</p>
-              <p><strong>Description:</strong> {result.data.description}</p>
-            </>
-          ) : (
-            <pre>{JSON.stringify(result, null, 2)}</pre>
-          )}
-        </div>
+        <pre style={{ background: "#eee", padding: 12 }}>
+          {JSON.stringify(result, null, 2)}
+        </pre>
       )}
     </div>
   );

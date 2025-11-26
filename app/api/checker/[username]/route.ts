@@ -1,30 +1,13 @@
-import { NextResponse } from "next/server";
-
-export const dynamic = "force-dynamic"; // force runtime execution
-
-export async function GET(request, { params }) {
-  const username = params?.username || "zama";
+export default async function handler(req, res) {
   const token = process.env.TWITTER_BEARER;
+  const search = req.query.q;
 
-  if (!token) {
-    return NextResponse.json(
-      { error: "TWITTER_BEARER missing on server" },
-      { status: 500 }
-    );
-  }
+  const r = await fetch(`https://api.twitter.com/2/tweets/search/recent?query=${search}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
-  try {
-    const url = `https://api.twitter.com/2/users/by/username/${encodeURIComponent(username)}?user.fields=public_metrics,verified,description`;
-    const resp = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "User-Agent": "zama-checker"
-      }
-    });
-
-    const data = await resp.json();
-    return NextResponse.json(data, { status: resp.status });
-  } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
-  }
+  const data = await r.json();
+  res.status(200).json(data);
 }

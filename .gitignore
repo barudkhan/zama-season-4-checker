@@ -1,5 +1,0 @@
-node_modules
-.next
-.env.local
-.env
-.DS_Store
